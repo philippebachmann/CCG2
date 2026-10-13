@@ -54,7 +54,27 @@ button.small{font-size:1.15rem;padding:5px 20px;background:var(--paper)}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;color:var(--ink);
   background:conic-gradient(var(--sun) calc(var(--e,0)*1%),var(--paper) 0);box-shadow:3px 3px 0 var(--ink);touch-action:none}
 @keyframes pulse{50%{transform:scale(1.06)}}
-/* Energieanzeige auf dem Dach (nur Anzeige: Antippen des Dachs löst das Talent aus) */
+/* Talent-Knopf unten (links / Mitte / rechts wählbar) mit grünem Energiering */
+.abil{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom,0px));width:80px;height:80px;padding:0;border-radius:50%;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--ink);touch-action:none;
+  background:conic-gradient(#4cc23f calc(var(--e,0)*1%),rgba(255,253,246,.9) 0);box-shadow:3px 3px 0 var(--ink)}
+.abil::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+.abil>span{position:relative}
+.abil .abilName{font-size:1.05rem;min-width:0}
+.abil .abilVal{font-size:.68rem}
+.abil.cool{background:conic-gradient(#9aa3ad calc(var(--e,0)*1%),rgba(255,253,246,.9) 0)}
+.abil.cool .abilName{font-size:1.6rem}
+.abil.ready{animation:abilPulse 1s ease-in-out infinite}
+.abil.empty .abilName{opacity:.55}
+.abil:active{transform:translate(2px,2px)}
+@keyframes abilPulse{50%{box-shadow:3px 3px 0 var(--ink),0 0 0 5px rgba(110,210,80,.65)}}
+@media (prefers-reduced-motion:reduce){.abil.ready{animation:none}}
+.abil.pos-l{left:calc(14px + env(safe-area-inset-left,0px))}
+.abil.pos-r{right:calc(14px + env(safe-area-inset-right,0px))}
+.abil.pos-m{left:50%;margin-left:-40px}
+@media (min-width:700px) and (min-height:700px){.abil{width:96px;height:96px}.abil.pos-m{margin-left:-48px}.abil .abilName{font-size:1.3rem}.abil .abilVal{font-size:.8rem}}
+@media (orientation:landscape) and (max-height:560px){.abil{width:64px;height:64px;bottom:calc(4px + env(safe-area-inset-bottom,0px))}.abil.pos-m{margin-left:-32px}.abil::before{inset:6px}.abil .abilName{font-size:.85rem}.abil .abilVal{font-size:.58rem}}
+/* (alte Energieleiste, nicht mehr verwendet) */
 .nrg{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));pointer-events:none;
   display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:4px 8px;width:min(64%,300px);
   background:var(--paper);border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);padding:5px 10px 4px}
@@ -151,6 +171,14 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
 .logo .sub{font-size:.42em;letter-spacing:.08em;color:var(--pop);-webkit-text-stroke:1.5px var(--ink);text-shadow:2px 2px 0 var(--ink);transform:rotate(-3deg);margin-top:2px}
 @media (min-width:700px) and (min-height:700px){.panel h1.logo{font-size:4.6rem}}
 @media (orientation:landscape) and (max-height:560px){.panel h1.logo{font-size:2.5rem}}
+/* ---------- Position Talent-Knopf ---------- */
+.posrow{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.85rem}
+.pos{display:flex;border:2px solid var(--ink);border-radius:20px;overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
+.pos button{font-family:var(--body);font-weight:700;font-size:.8rem;letter-spacing:0;padding:4px 10px;border:0;border-left:2px solid var(--ink);border-radius:0;box-shadow:none;background:var(--paper)}
+.pos button:first-child{border-left:0}
+.pos button:active{transform:none}
+.pos button[aria-pressed="true"]{background:#4cc23f;color:var(--ink)}
+@media (orientation:landscape) and (max-height:560px){.posrow{font-size:.72rem}.pos button{font-size:.7rem;padding:3px 8px}}
 /* ---------- Modus-Wahl ---------- */
 .modes{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:3px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:3px 3px 0 var(--ink);width:100%;max-width:360px}
 .modes button{font-family:var(--display);font-size:clamp(.78rem,3.5vw,1.05rem);letter-spacing:.02em;white-space:nowrap;overflow:hidden;padding:8px 2px;border:0;border-left:2px solid var(--ink);border-radius:0;box-shadow:none;background:var(--paper);min-width:0}
@@ -216,7 +244,7 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
 
   <button type="button" class="home" id="homeBtn" hidden aria-label="Zum Startbildschirm"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9.5h4.5V14h3v5.5H18V10" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg></button>
   <button type="button" class="joker" id="jokerBtn" hidden aria-label="Joker Marisa"><canvas id="jokerPv" aria-hidden="true"></canvas><span class="jcnt" id="jokerCnt"></span></button>
-  <div class="nrg" id="abil" hidden aria-hidden="true"><span class="abilName" id="abilName">HIEB</span><span class="nrgBar"><i id="abilFill"></i></span><span class="abilVal" id="abilVal">0</span><span class="nrgHint">Dach antippen = Talent</span></div>
+  <button type="button" class="abil pos-r" id="abil" hidden aria-label="Spezialfähigkeit"><span class="abilName" id="abilName">HIEB</span><span class="abilVal" id="abilVal">0</span></button>
   <div class="panel" id="start">
     <div class="colA">
     <h1 class="logo">NINE LIVES<span class="sub">Attack or hide!</span></h1>
@@ -231,6 +259,7 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
       <button type="button" data-mode="easy">Einfach</button><button type="button" data-mode="mid">Mittel</button><button type="button" data-mode="hard">Schwierig</button><button type="button" data-mode="legend">Legende</button>
     </div>
     <button id="go" type="button">LOS!</button>
+    <div class="posrow"><span>Talent-Knopf:</span><div class="pos" role="group" aria-label="Position Talent-Knopf"><button type="button" data-pos="l">Links</button><button type="button" data-pos="m">Mitte</button><button type="button" data-pos="r">Rechts</button></div></div>
     <div class="toggles"><button type="button" id="fangBtn" aria-pressed="false">Zähne: aus</button><button type="button" id="soundBtn" aria-pressed="true">Ton: an</button><button type="button" id="musicBtn" aria-pressed="true">Musik: an</button></div>
     <div class="row"><button type="button" class="small" id="helpBtn">ANLEITUNG</button><span class="hint" id="best0"></span></div>
     </div>
@@ -238,7 +267,7 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
 
   <div class="panel" id="help" hidden>
     <h2>So geht's</h2>
-    <p class="ctl"><b>Modus:</b> Einfach 100 %, Mittel 150 %, Schwierig 200 %, Legende 250 % Tempo – es bleibt das ganze Spiel gleich. Jeder Modus hat seinen eigenen Rekord.<br><b>Wischen</b> links/rechts = laufen · <b>Tippen</b> = springen · <b>Tipp aufs Dach</b> (unten) = Talent</p>
+    <p class="ctl"><b>Modus:</b> Einfach 100 %, Mittel 150 %, Schwierig 200 %, Legende 250 % Tempo – es bleibt das ganze Spiel gleich. Jeder Modus hat seinen eigenen Rekord.<br><b>Wischen</b> links/rechts = laufen · <b>Tippen</b> = springen · <b>Knopf unten</b> = Talent (Position im Menü wählbar, geht auch beim Laufen und im Sprung)</p>
     <div class="legend">
       <span><i class="dot" style="background:#3b8fe8"></i>Tropfen</span>
       <span><i class="dot" style="background:#ffb030"></i>Fisch +5</span>
@@ -2296,7 +2325,7 @@ function followMouse(e){
 }
 cv.addEventListener('pointerdown',e=>{
   e.preventDefault();
-  if(e.pointerType==='mouse'){followMouse(e);if(e.button===0){if(state==='play'&&onFloor(e.clientY))useAbil();else jump();}return;}
+  if(e.pointerType==='mouse'){followMouse(e);if(e.button===0)jump();return;}
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
   ptrs.set(e.pointerId,{lx:e.clientX,ay:e.clientY,t:performance.now(),moved:0});
   if(mover===null)mover=e.pointerId;
@@ -2323,11 +2352,10 @@ function endPtr(e,cancel){
 }
 // Tipp-Erkennung: ein Tipp = sofort springen, zweiter Tipp kurz danach = Spezialfähigkeit
 let tapTimer=null,lastTap=0;
-// Tipp aufs Dach (unterer Bereich) = Talent, sonst springen
+// Tipp = springen (Talent über den Knopf unten)
 const onFloor=y=>y-cv.getBoundingClientRect().top>groundY()+10*S;
 function onTap(y){
   if(state!=='play')return;
-  if(y!=null&&onFloor(y)){useAbil();return;}
   jump();
 }
 cv.addEventListener('pointerup',e=>endPtr(e,false));
@@ -2472,6 +2500,16 @@ function goHome(){
   $('help').hidden=true;
   showBest();
 }
+// Talent-Knopf: eigener Finger, unabhängig vom Lauf-Finger (Multitouch) – geht auch im Sprung
+$('abil').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();useAbil();});
+$('abil').addEventListener('click',e=>e.preventDefault());
+const POS={l:'links',m:'Mitte',r:'rechts'};
+let btnPos='r';try{const v=localStorage.getItem('ccg-btnpos');if(POS[v])btnPos=v;}catch(e){}
+function setPos(v){btnPos=v;try{localStorage.setItem('ccg-btnpos',v)}catch(e){}
+  const b=$('abil');for(const k in POS)b.classList.toggle('pos-'+k,k===v);
+  for(const x of document.querySelectorAll('[data-pos]'))x.setAttribute('aria-pressed',x.dataset.pos===v?'true':'false');}
+for(const x of document.querySelectorAll('[data-pos]'))x.addEventListener('click',()=>setPos(x.dataset.pos));
+setPos(btnPos);
 $('jokerBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();useJoker();});
 addEventListener('resize',()=>{if(state==='play')drawJokerIcon();});
 $('homeBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();goHome();});
