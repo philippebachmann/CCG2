@@ -2327,7 +2327,7 @@ cv.addEventListener('pointerdown',e=>{
   e.preventDefault();
   if(e.pointerType==='mouse'){followMouse(e);if(e.button===0)jump();return;}
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
-  ptrs.set(e.pointerId,{lx:e.clientX,ay:e.clientY,t:performance.now(),moved:0});
+  ptrs.set(e.pointerId,{lx:e.clientX,ax:e.clientX,ay:e.clientY,at:performance.now(),t:performance.now(),moved:0,vmoved:0});
   if(mover===null)mover=e.pointerId;
 });
 cv.addEventListener('pointermove',e=>{
@@ -2338,13 +2338,17 @@ cv.addEventListener('pointermove',e=>{
   if(e.pointerId!==mover)return;
   const d=e.clientX-p.lx;p.moved+=Math.abs(d);
   cat.tx+=d*1.4;p.lx=e.clientX;
-  if(e.clientY>p.ay)p.ay=e.clientY;
-  else if(p.ay-e.clientY>32){jump();p.ay=e.clientY;p.moved+=20;}
+  // Wisch nach oben = Sprung, aber nur bei einem klaren, schnellen Wisch senkrecht nach oben.
+  // Beim Richtungswechsel (Finger macht einen kleinen Bogen) wird so nicht mehr versehentlich gesprungen.
+  const now=performance.now();p.vmoved+=Math.abs(e.clientY-(p.ly??e.clientY));p.ly=e.clientY;
+  if(e.clientY>p.ay||now-p.at>260){p.ay=e.clientY;p.ax=e.clientX;p.at=now;}
+  else{const dy=p.ay-e.clientY,dx=Math.abs(e.clientX-p.ax);
+    if(dy>46&&dy>dx*2){jump();p.ay=e.clientY;p.ax=e.clientX;p.at=now;p.moved+=20;}}
 });
 function endPtr(e,cancel){
   const p=ptrs.get(e.pointerId);if(!p)return;
   ptrs.delete(e.pointerId);
-  if(!cancel&&p.moved<14&&performance.now()-p.t<350)onTap(e.clientY);
+  if(!cancel&&p.moved<12&&p.vmoved<16&&performance.now()-p.t<300)onTap(e.clientY);
   if(e.pointerId===mover){
     mover=ptrs.size?ptrs.keys().next().value:null;
     if(mover!==null){const q=ptrs.get(mover);q.lx=q.lx;}
