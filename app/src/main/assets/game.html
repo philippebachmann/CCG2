@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <style>body{-webkit-text-size-adjust:100%}</style>
 <title>CrazyCatGame</title>
 </head><body>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@500;700&display=swap">
 <style>
@@ -63,6 +63,8 @@ button.small{font-size:1.15rem;padding:5px 20px;background:var(--paper)}
 .abil.ready{animation:pulse 1s ease-in-out infinite}
 .abil.empty{opacity:.75}
 @keyframes pulse{50%{transform:scale(1.06)}}
+.abil.side-r{left:auto!important;margin-left:0!important;right:calc(14px + env(safe-area-inset-right,0px))}
+.abil.side-l{left:calc(14px + env(safe-area-inset-left,0px))!important;margin-left:0!important}
 .abil:active{transform:translate(3px,3px)}
 @media (prefers-reduced-motion:reduce){.abil.ready{animation:none}}
 .skin{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
@@ -132,6 +134,48 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
   .abilName{font-size:.8rem}.abilVal{font-size:.6rem}
 }
 #sabProbe{position:absolute;visibility:hidden;pointer-events:none;height:env(safe-area-inset-bottom,0px);width:1px}
+/* ---------- Startmenü: kompakt, mit Figuren-Vorschau ---------- */
+.tag{font-size:.95rem;font-weight:700;margin:0;max-width:30ch;text-wrap:balance}
+.chars{display:flex;gap:12px;justify-content:center;width:100%}
+.char{font-family:var(--body);letter-spacing:0;display:flex;flex-direction:column;align-items:center;gap:0;padding:6px 6px 8px;
+  flex:1 1 0;max-width:170px;min-width:0;background:var(--paper);border-radius:16px;border-width:3px;box-shadow:3px 3px 0 var(--ink);color:var(--ink)}
+.char .pv{width:100%;aspect-ratio:5/4;display:block;border-radius:10px;background:#bfe9f6}
+.char .cname{font-family:var(--display);font-size:1.5rem;letter-spacing:.04em;line-height:1.1;margin-top:4px}
+.char .cab{font-size:.75rem;font-weight:700;opacity:.7;line-height:1}
+.char[aria-pressed="true"]{background:var(--sun);transform:translateY(-3px);box-shadow:4px 6px 0 var(--ink)}
+.char[aria-pressed="true"] .pv{background:#d6f3fb}
+.char[aria-pressed="false"] .pv{opacity:.75;filter:saturate(.75)}
+#go{font-size:2.2rem;padding:8px 44px}
+.toggles{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.toggles button{font-family:var(--body);font-weight:700;font-size:.8rem;letter-spacing:0;padding:4px 10px;border-width:2px;border-radius:20px;box-shadow:2px 2px 0 var(--ink);background:var(--paper)}
+.toggles button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.row{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.row .small{font-size:1rem;padding:4px 14px}
+#help{width:min(92%,440px);text-align:left;align-items:stretch;top:50%}
+#help h2{font-family:var(--display);font-weight:400;font-size:2rem;margin:0;text-align:center;letter-spacing:.04em}
+#help .ctl{font-size:.88rem;max-width:none}
+#help .rules,#help .keys{max-width:none}
+#help .legend{justify-content:center}
+#help #helpBack{align-self:center}
+@media (min-width:700px) and (min-height:700px){
+  .tag{font-size:1.15rem}.char{max-width:220px}.char .cname{font-size:1.9rem}.char .cab{font-size:.9rem}
+  .toggles button{font-size:1rem;padding:6px 14px}#go{font-size:2.6rem}
+  #help{width:min(80%,560px)}#help .ctl{font-size:1.05rem}
+}
+@media (orientation:landscape) and (max-height:560px){
+  .tag{font-size:.8rem}.chars{gap:8px}.char{max-width:130px;padding:4px 4px 6px}.char .cname{font-size:1.15rem}.char .cab{font-size:.65rem}
+  #go{font-size:1.8rem;padding:6px 36px}.toggles button{font-size:.72rem;padding:3px 8px}
+  #help{width:min(86%,620px)}#help h2{font-size:1.5rem}#help .ctl{font-size:.75rem}
+}
+#start{gap:12px}
+@media (max-width:699px) and (orientation:portrait){
+  #start{width:min(92%,400px);padding:22px 18px 18px}
+  .tag{font-size:1rem}.char .cname{font-size:1.7rem}.char .cab{font-size:.85rem}
+  .toggles button{font-size:.9rem;padding:5px 12px}#go{font-size:2.4rem}
+  #help .rules{font-size:.9rem}#help .ctl{font-size:.92rem}
+}
+@media (orientation:landscape) and (max-height:560px){#start{width:min(94%,640px)}}
+@media (orientation:landscape) and (min-width:600px){#start{grid-template-columns:1.2fr 1fr;text-align:center}#start .colB{align-items:center}}
 </style>
 
 <div id="wrap">
@@ -149,16 +193,22 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
   <div class="panel" id="start">
     <div class="colA">
     <h1>CrazyCatGame</h1>
-    <p>Wähle <b>Ronaldo</b> oder <b>Mali</b> und weich allem aus! Wisch nach links und rechts zum Laufen. <b>Tippen</b> oder nach oben wischen lässt springen, auch schräg im Lauf. <b>Doppeltipp</b> oder der Knopf unten in der Mitte löst die Spezialfähigkeit aus.</p>
-    <div class="skin" role="group" aria-label="Spielfigur">
-      <button type="button" id="skinTabby" data-skin="tabby">Ronaldo</button>
-      <button type="button" id="skinMali" data-skin="mali">Mali</button>
+    <p class="tag">Weich aus, schnapp Fische, behalte deine 9 Leben!</p>
+    <div class="chars" role="group" aria-label="Spielfigur">
+      <button type="button" class="char" id="skinTabby" data-skin="tabby"><canvas class="pv" id="pvTabby" aria-hidden="true"></canvas><span class="cname">Ronaldo</span><span class="cab">Talent: Pfotenhieb</span></button>
+      <button type="button" class="char" id="skinMali" data-skin="mali"><canvas class="pv" id="pvMali" aria-hidden="true"></canvas><span class="cname">Mali</span><span class="cab">Talent: Unsichtbar</span></button>
     </div>
-    <button id="go" type="button">LOS!</button>
-    <div class="skin"><button type="button" id="fangBtn" aria-pressed="false">Fangzähne</button><button type="button" id="soundBtn" aria-pressed="true">Ton: an</button><button type="button" id="musicBtn" aria-pressed="true">Musik: an</button></div>
-    <div class="hint" id="best0"></div>
     </div>
     <div class="colB">
+    <button id="go" type="button">LOS!</button>
+    <div class="toggles"><button type="button" id="fangBtn" aria-pressed="false">Zähne: aus</button><button type="button" id="soundBtn" aria-pressed="true">Ton: an</button><button type="button" id="musicBtn" aria-pressed="true">Musik: an</button><button type="button" id="sideBtn" aria-pressed="true">Knopf: rechts</button></div>
+    <div class="row"><button type="button" class="small" id="helpBtn">ANLEITUNG</button><span class="hint" id="best0"></span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="help" hidden>
+    <h2>So geht's</h2>
+    <p class="ctl"><b>Wischen</b> links/rechts = laufen · <b>Tippen</b> = springen · <b>Doppeltipp</b> oder Knopf unten = Spezialfähigkeit</p>
     <div class="legend">
       <span><i class="dot" style="background:#3b8fe8"></i>Tropfen</span>
       <span><i class="dot" style="background:#ffb030"></i>Fisch +5</span>
@@ -168,14 +218,19 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
       <li><b>Ab Level 3</b> rennen Hunde heran. Spring rechtzeitig.</li>
       <li><b>Ab Level 6</b> stossen Krähen herab. Lauf weg, wenn eine KRAH! ruft.</li>
       <li><b>Ab Level 9</b> kriechen Schlangen heran und schnappen nach oben. Spring hoch und rechtzeitig.</li>
-      <li><b>Ab Level 12</b> stürzen Adler herab. Lauf weg, wenn das Fadenkreuz erscheint.</li>
-      <li><b>Draufspringen:</b> Lande von oben auf Hund (+15) oder Krähe (+20), dann ist er besiegt.</li>
-      <li><b>Spezialfähigkeit:</b> Ronaldo besiegt mit dem <b>Pfotenhieb</b> Gegner vor ihm (5 Energie). Mali macht sich <b>3 Sekunden unsichtbar</b> und unverwundbar (10 Energie). Jeder Fisch bringt +5 Energie, maximal 100. Danach 3 Sekunden Abklingzeit.</li>
+      <li><b>Ab Level 12</b> hüpfen Erdkröten heran und schnellen die Zunge raus. Spring drüber.</li>
+      <li><b>Ab Level 15</b> springt der Fuchs in grossen Sätzen. Lauf unter ihm durch.</li>
+      <li><b>Ab Level 18</b> rollt der Igel als Stachelkugel. Spring drüber, aber nie drauf!</li>
+      <li><b>Ab Level 21</b> kommt der Dachs. Er kann einmal plötzlich umdrehen. <b>Kostet 2 Leben!</b></li>
+      <li><b>Ab Level 24</b> stürzen Adler herab. Lauf weg, wenn das Fadenkreuz erscheint. <b>Kostet 2 Leben!</b></li>
+      <li><b>Ab Level 27</b> kommen Hund und Krähe gemeinsam. Alle 3 Level stösst ein weiterer Gegner zur Bande, ab Level 39 greifen drei auf einmal an.</li>
+      <li><b>Draufspringen:</b> Lande von oben auf Hund, Krähe, Kröte, Fuchs oder Dachs, dann ist er besiegt (+15 bis +20). Nicht auf den Igel!</li>
+      <li><b>Spezialfähigkeit:</b> Ronaldo besiegt mit dem <b>Pfotenhieb</b> Gegner vor ihm (5 Energie). Mali macht sich <b>5 Sekunden unsichtbar</b> und unverwundbar (10 Energie). Jeder Fisch bringt +5 Energie, maximal 100. Danach 3 Sekunden Abklingzeit.</li>
       <li><b>Superfisch:</b> 10 Sekunden Superkräfte, kick alles weg! Dazu +50 Energie.</li>
       <li><b>9 Leben</b> wie jede Katze. Alle 5 Level gibt es ein verlorenes zurück.</li>
     </ul>
     <div class="keys"><b>Am Computer:</b> Katze folgt der Maus, Klick springt. Oder <kbd>←</kbd> <kbd>→</kbd> laufen, <kbd>Leertaste</kbd> springen, <kbd>E</kbd> Spezialfähigkeit.</div>
-    </div>
+    <button type="button" class="small" id="helpBack">ZURÜCK</button>
   </div>
 
   <div class="panel" id="over" hidden>
@@ -349,6 +404,21 @@ const SFX=(()=>{
       const sub=ac.createOscillator();sub.type='sine';sub.frequency.setValueAtTime(48,t);sub.frequency.linearRampToValueAtTime(40,t+d);
       const sg=ac.createGain();sg.gain.setValueAtTime(.0001,t);sg.gain.exponentialRampToValueAtTime(.7,t+.4);sg.gain.exponentialRampToValueAtTime(.0001,t+d);sub.connect(sg);sg.connect(master);
       [o,o2,am,sub].forEach(x=>{x.start(t);x.stop(t+d+.05);});},
+    croak(){if(!ok())return;[0,.32].forEach(dl=>{const t=ac.currentTime+dl,d=.26,o=ac.createOscillator();o.type='sawtooth';
+      o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(92,t+d);
+      const ws=ac.createWaveShaper();ws.curve=curve(8);const bp=filt('bandpass',620,2),lp=filt('lowpass',1400),g=ac.createGain();env(g,t,.02,1.3,d);
+      const vca=ac.createGain();vca.gain.value=.5;const am=ac.createOscillator();am.frequency.value=24;const ag=ac.createGain();ag.gain.value=.5;am.connect(ag);ag.connect(vca.gain);
+      o.connect(ws);ws.connect(bp);bp.connect(lp);lp.connect(g);g.connect(vca);vca.connect(master);o.start(t);o.stop(t+d+.02);am.start(t);am.stop(t+d+.02);});},
+    yip(){if(!ok())return;[0,.13,.26].forEach((dl,i)=>{const t=ac.currentTime+dl,d=.11,o=ac.createOscillator();o.type='sawtooth';
+      o.frequency.setValueAtTime(900-i*40,t);o.frequency.exponentialRampToValueAtTime(1450-i*60,t+d*.35);o.frequency.exponentialRampToValueAtTime(760,t+d);
+      const ws=ac.createWaveShaper();ws.curve=curve(5);const f1=filt('bandpass',1300,3),f2=filt('bandpass',2800,4),g=ac.createGain();env(g,t,.008,1.2,d);
+      o.connect(ws);ws.connect(f1);ws.connect(f2);f1.connect(g);f2.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02);});},
+    roll(){if(!ok())return;const t=ac.currentTime,d=1.1;
+      const n=noise(t,d),lp=filt('lowpass',320),g=ac.createGain();env(g,t,.08,1.1,d);
+      const vca=ac.createGain();vca.gain.value=.55;const am=ac.createOscillator();am.frequency.setValueAtTime(9,t);am.frequency.linearRampToValueAtTime(22,t+d);const ag=ac.createGain();ag.gain.value=.45;am.connect(ag);ag.connect(vca.gain);
+      n.connect(lp);lp.connect(g);g.connect(vca);vca.connect(master);am.start(t);am.stop(t+d);
+      [0,.09,.18].forEach(dl=>{const tt=t+dl,sn=noise(tt,.06),bp=filt('bandpass',2600,3),sg=ac.createGain();env(sg,tt,.005,.5,.06);sn.connect(bp);bp.connect(sg);sg.connect(master);});},
+    grunt(){if(!ok())return;meow({f:[105,150,85],dur:.5,harsh:10,growl:30,vol:1.9,q1:2,q2:2.5,fm:[350,520,300],dry:.3});},
     puma(){if(!ok())return;const t=ac.currentTime,d=1.5;
       const o=ac.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(650,t);o.frequency.exponentialRampToValueAtTime(1350,t+.35);o.frequency.exponentialRampToValueAtTime(1050,t+.9);o.frequency.exponentialRampToValueAtTime(520,t+d);
       const lfo=ac.createOscillator();lfo.frequency.value=7;const lg=ac.createGain();lg.gain.value=45;lfo.connect(lg);lg.connect(o.frequency);
@@ -422,16 +492,32 @@ const MUSIC=(()=>{
 const MAX_LIVES=9;
 const ABIL_COST={tabby:5,mali:10},ABIL_CD=3;let energy=0,ghost=0,swipe=0,abilCd=0; // eine Katze hat 9 Leben
 let state='start',score=0,level=1,lives=MAX_LIVES,t=0,spawnT=0,items=[],fx=[],enemies=[],kicked=[],splashes=[],cat=null,
-    inv=0,shake=0,power=0,enemyT=0,nextEnemy=null,banner=null,startBest=0;
+    inv=0,shake=0,power=0,enemyT=0,nextEnemy=null,banner=null,startBest=0,pending=[];
 // Gegner-Freischaltung: alle 3 Level ein neuer
-const UNLOCK={dog:3,crow:6,snake:9,eagle:12};
+// Reihenfolge der Gegner: alle 3 Level ein neuer, der Adler zuletzt
+const ORDER=['dog','crow','snake','toad','fox','hedgehog','badger','eagle'];
+const UNLOCK={};ORDER.forEach((k,i)=>UNLOCK[k]=3+3*i);          // Hund 3, Krähe 6 … Dachs 21, Adler 24
+const MIX_START=UNLOCK.eagle+3;                                  // ab Level 27: zweiter Durchgang, Gegner gemeinsam
+const NAMES={dog:'HUND',crow:'KRÄHE',snake:'SCHLANGE',toad:'KRÖTE',fox:'FUCHS',hedgehog:'IGEL',badger:'DACHS',eagle:'ADLER'};
+// Erster Durchgang: in jedem 3er-Block nur der neue Gegner, einzeln.
+// Zweiter Durchgang: Hund + Krähe gemeinsam, dann alle 3 Level einer mehr in der Gruppe.
+function enemyPlan(){
+  if(level<UNLOCK.dog)return null;
+  if(level<MIX_START)return {kinds:[ORDER[Math.min(ORDER.length-1,Math.floor((level-UNLOCK.dog)/3))]],n:1};
+  const cnt=Math.min(ORDER.length,2+Math.floor((level-MIX_START)/3));
+  return {kinds:ORDER.slice(0,cnt),n:level>=MIX_START+12?3:2};
+}
+const BANNERS={dog:['ACHTUNG, HUND!','Tippen zum Springen'],crow:['ACHTUNG, KRÄHE!','Lauf weg, wenn sie KRAH! ruft'],
+  snake:['ACHTUNG, SCHLANGE!','Spring rechtzeitig hoch drüber!'],eagle:['ACHTUNG, ADLER!','Weg vom Fadenkreuz!'],
+  toad:['ACHTUNG, KRÖTE!','Spring über ihre Zunge!'],fox:['ACHTUNG, FUCHS!','Lauf unter seinen Sprüngen durch!'],
+  hedgehog:['ACHTUNG, IGEL!','Spring drüber – nicht drauf!'],badger:['ACHTUNG, DACHS!','Er kann plötzlich umdrehen!']};
 const GRAV=()=>2300*S, JUMPV=()=>880*S, POWER_TIME=10;
 
 function reset(){
   cat={x:W/2,y:groundY(),tx:W/2,face:1,fs:1,run:0,jy:0,vy:0,air:false,vx:0};
   energy=0;ghost=0;swipe=0;abilCd=0;
   score=0;level=1;lives=MAX_LIVES;t=0;spawnT=.6;items=[];fx=[];enemies=[];kicked=[];splashes=[];
-  inv=0;shake=0;power=0;enemyT=1.5;nextEnemy=null;banner=null;
+  inv=0;shake=0;power=0;enemyT=1.5;nextEnemy=null;banner=null;pending=[];
   const m=/^#l(\d+)$/.exec(location.hash||'');   // Testmodus: Link mit #l5 oder #l10 startet in diesem Level
   if(m&&+m[1]>1){level=+m[1];score=(level-1)*100;}
   updHud();
@@ -446,10 +532,14 @@ function addScore(n){
   updHud();
 }
 function onLevel(l){
-  if(l===UNLOCK.dog){showBanner('ACHTUNG, HUND!','Tippen zum Springen');nextEnemy='dog';enemyT=Math.min(enemyT,2);}
-  else if(l===UNLOCK.crow){showBanner('ACHTUNG, KRÄHE!','Lauf weg, wenn sie KRAH! ruft');nextEnemy='crow';enemyT=Math.min(enemyT,2);}
-  else if(l===UNLOCK.snake){showBanner('ACHTUNG, SCHLANGE!','Spring rechtzeitig hoch drüber!');nextEnemy='snake';enemyT=Math.min(enemyT,2);}
-  else if(l===UNLOCK.eagle){showBanner('ACHTUNG, ADLER!','Weg vom Fadenkreuz!');nextEnemy='eagle';enemyT=Math.min(enemyT,2);}
+  const nk=Object.keys(UNLOCK).find(k=>UNLOCK[k]===l);
+  if(nk){showBanner(...BANNERS[nk]);nextEnemy=nk;enemyT=Math.min(enemyT,2);}
+  else if(l>=MIX_START&&(l-MIX_START)%3===0&&2+(l-MIX_START)/3<=ORDER.length){
+    const cnt=2+(l-MIX_START)/3,add=ORDER[cnt-1];
+    if(l===MIX_START)showBanner('JETZT GEMEINSAM!','Hund und Krähe kommen zusammen');
+    else showBanner('DAZU KOMMT: '+NAMES[add]+'!',l===MIX_START+12?'Ab jetzt 3 Gegner auf einmal!':'Die Bande wird grösser');
+    nextEnemy=add;enemyT=Math.min(enemyT,2);
+  }
   else hit(W/2,H*.4,'LEVEL '+l+'!','#ffd23f');
   // Nach jeweils 5 überstandenen Leveln (Level 6, 11, 16 …) ein Herz zurück
   if(l>1&&(l-1)%5===0&&lives<MAX_LIVES){lives++;hit(cat.x,cat.y-100*S,'HERZ ZURÜCK! ♥','#ff4f8b');}
@@ -462,9 +552,9 @@ function updHud(){
 }
 function hit(x,y,text,col){fx.push({x,y,text,col,life:1});}
 
-function hurt(x,y,txt){
+function hurt(x,y,txt,dmg){
   if(inv>0||ghost>0)return false;
-  lives--;inv=1.4;shake=.3;hit(x,y,txt,'#ff4f8b');updHud();
+  lives-=dmg||1;if(dmg>1)txt+=' -'+dmg+' ♥';inv=1.4;shake=.3;hit(x,y,txt,'#ff4f8b');updHud();
   if(lives<=0)gameOver();
   return true;
 }
@@ -549,6 +639,92 @@ function spawnEagle(){
   enemies.push({kind:'eagle',phase:'in',x:side<0?-60*S:W+60*S,y:H*.17,hx:W/2+side*W*.22,t:0,flap:0,face:-side,vx:0,vy:0,ty:0,hitCat:false});
 }
 
+// --- Neue Bodengegner ab Level 15 ---
+const sideX=(dir,m)=>dir>0?-m*S:W+m*S;
+function spawnToad(){const dir=Math.random()<.5?1:-1;
+  enemies.push({kind:'toad',dir,x:sideX(dir,40),warn:1,sp:Math.min(270,175+(level-UNLOCK.toad)*8)*S,hop:0,jy:0,tongue:-1,cd:.5,passed:false,hitCat:false});}
+function spawnFox(){const dir=Math.random()<.5?1:-1;
+  enemies.push({kind:'fox',dir,x:sideX(dir,70),warn:.9,sp:Math.min(430,300+(level-UNLOCK.fox)*10)*S,lp:0,lh:95*S,jy:0,passed:false,hitCat:false});}
+function spawnHedgehog(){const dir=Math.random()<.5?1:-1;
+  enemies.push({kind:'hedgehog',dir,x:sideX(dir,40),warn:1.1,sp:Math.min(580,390+(level-UNLOCK.hedgehog)*12)*S,rot:0,passed:false,hitCat:false});}
+function spawnBadger(){const dir=Math.random()<.5?1:-1;
+  // dreht mit 75 % Wahrscheinlichkeit einmal an einer zufälligen Stelle um
+  const turn=Math.random()<.75?W*(.22+Math.random()*.56):null;
+  enemies.push({kind:'badger',dir,x:sideX(dir,70),warn:1,sp:Math.min(440,270+(level-UNLOCK.badger)*10)*S,run:0,turn,turned:false,pause:0,passed:false,hitCat:false});}
+const SPAWN={dog:spawnDog,crow:spawnCrows,snake:spawnSnake,eagle:spawnEagle,toad:spawnToad,fox:spawnFox,hedgehog:spawnHedgehog,badger:spawnBadger};
+const offScreen=(e,m)=>(e.dir>0&&e.x>W+m*S)||(e.dir<0&&e.x<-m*S);
+// Gibt true zurück, wenn der Gegner entfernt wurde; 'stop' wenn das Spiel vorbei ist
+function stepGround(e,i,dt,cx,cy){
+  const gy=groundY(),dx=Math.abs(e.x-cat.x),feet=cat.y-cat.jy,strong=power>0||swipe>0;
+  const passCheck=(m,pts,txt)=>{if(!e.passed&&(cat.x-e.x)*e.dir<-m*S){e.passed=true;if(!e.hitCat){hit(cat.x,cy-40*S,txt+' +'+pts,'#ffd23f');addScore(pts);}}};
+  const ouch=(x,y,txt,dmg)=>{if(e.hitCat||inv>0||ghost>0)return false;e.hitCat=true;hurt(x,y,txt,dmg);return state!=='play';};
+  if(e.kind==='toad'){
+    if(e.tongue>=0){e.tongue+=dt/.5;if(e.tongue>=1){e.tongue=-1;e.cd=1.5;}}
+    else{
+      e.hop+=dt/.6;const p=e.hop%1;
+      if(p<.62){e.jy=Math.sin(Math.PI*p/.62)*26*S;e.x+=e.dir*e.sp*dt;}else e.jy=0;
+      if(e.cd>0)e.cd-=dt;
+      const ahead=(cat.x-e.x)*e.dir;
+      if(e.cd<=0&&e.jy===0&&ahead>40*S&&ahead<150*S){e.tongue=0;SFX.croak();}
+    }
+    if(stompFalling()&&dx<40*S&&cat.jy>e.jy+12*S&&cat.jy<e.jy+70*S){enemies.splice(i,1);stomp(e,e.x,gy-e.jy,15);return true;}
+    if(dx<34*S&&cat.jy<e.jy+26*S){
+      if(strong){enemies.splice(i,1);kick(e,e.x,gy-16*S,15,KL());return true;}
+      if(ouch(e.x,gy-50*S,'QUAAK!'))return 'stop';
+    }
+    if(e.tongue>=0){
+      const L=Math.sin(Math.PI*Math.min(1,e.tongue))*110*S,m=e.x+e.dir*22*S,tip=m+e.dir*L;
+      if(L>10*S&&cat.jy<24*S&&(cat.x-m)*e.dir>-10*S&&(cat.x-tip)*e.dir<14*S){
+        if(strong){enemies.splice(i,1);kick(e,e.x,gy-16*S,15,KL());return true;}
+        if(ouch(tip,gy-50*S,'SCHLECK!'))return 'stop';
+      }
+    }
+    passCheck(34,12,'DRÜBER!');
+    if(offScreen(e,60))enemies.splice(i,1);
+  }else if(e.kind==='fox'){
+    e.lp+=dt/.66;if(e.lp>=1){e.lp-=1;e.lh=(75+Math.random()*45)*S;}
+    e.jy=Math.sin(Math.PI*e.lp)*e.lh;e.x+=e.dir*e.sp*dt;
+    const fy=gy-28*S-e.jy;
+    if(stompFalling()&&dx<46*S&&feet>fy-38*S&&feet<fy+12*S){enemies.splice(i,1);stomp(e,e.x,fy,20);return true;}
+    if(Math.hypot(e.x-cx,fy-cy)<36*S){
+      if(strong){enemies.splice(i,1);kick(e,e.x,fy,20,KL());return true;}
+      if(ouch(e.x,fy-30*S,'KEKEKE!'))return 'stop';
+    }
+    passCheck(40,12,'DRUNTER DURCH!');
+    if(offScreen(e,90))enemies.splice(i,1);
+  }else if(e.kind==='hedgehog'){
+    e.x+=e.dir*e.sp*dt;e.rot+=e.dir*e.sp*dt/(20*S);
+    if(dx<34*S&&cat.jy<40*S){
+      if(strong){enemies.splice(i,1);kick(e,e.x,gy-20*S,20,KL());return true;}
+      if(!e.hitCat&&inv<=0&&ghost<=0){
+        if(cat.air&&cat.vy<0){cat.vy=JUMPV()*.55;} // von den Stacheln abprallen
+        if(ouch(e.x,gy-60*S,'AUTSCH! STACHELN!'))return 'stop';
+      }
+    }
+    passCheck(36,15,'DRÜBER!');
+    if(offScreen(e,60))enemies.splice(i,1);
+  }else if(e.kind==='badger'){
+    if(e.pause>0){e.pause-=dt;if(e.pause<=0){e.dir*=-1;e.sp*=1.2;}}
+    else{
+      e.x+=e.dir*e.sp*dt;e.run+=dt*15;
+      if(!e.turned&&e.turn!==null&&(e.dir>0?e.x>=e.turn:e.x<=e.turn)){e.turned=true;e.pause=.45;SFX.grunt();hit(e.x,gy-80*S,'?!','#fffdf6');}
+    }
+    if(stompFalling()&&dx<44*S&&cat.jy>14*S&&cat.jy<80*S){enemies.splice(i,1);stomp(e,e.x,gy,20);return true;}
+    if(dx<40*S&&cat.jy<34*S){
+      if(strong){enemies.splice(i,1);kick(e,e.x,gy-24*S,20,KL());return true;}
+      if(ouch(e.x,gy-60*S,'GRRR!',2))return 'stop';
+    }
+    if(e.pause<=0&&offScreen(e,90)){
+      enemies.splice(i,1);
+      if(!e.hitCat){hit(cat.x,cy-40*S,'AUSGETRICKST! +15','#ffd23f');addScore(15);}
+      return true;
+    }
+  }
+  return false;
+}
+const GROUND_NEW=['toad','fox','hedgehog','badger'];
+const WARN_SND={toad:'croak',fox:'yip',hedgehog:'roll',badger:'grunt'};
+
 function stepFx(dt){
   for(let i=splashes.length-1;i>=0;i--){splashes[i].life-=dt*3;if(splashes[i].life<=0)splashes.splice(i,1);}
   for(let i=fx.length-1;i>=0;i--){fx[i].life-=dt*1.3;fx[i].y-=dt*40;if(fx[i].life<=0)fx.splice(i,1);}
@@ -575,15 +751,20 @@ function step(dt){
 
   spawnT-=dt;
   if(spawnT<=0){spawn();spawnT=Math.max(.18,.85/(1+.25*(level-1)))*(0.7+Math.random()*.5);}
-  // Gegner kommen einzeln: ein neuer erst, wenn keiner mehr unterwegs ist
-  const pool=Object.keys(UNLOCK).filter(k=>level>=UNLOCK[k]);
-  if(pool.length&&enemies.length===0){
+  // Gegnerwelle: eine neue erst, wenn keiner mehr unterwegs ist (im zweiten Durchgang mehrere gemeinsam, leicht versetzt)
+  for(let j=pending.length-1;j>=0;j--){pending[j].t-=dt;if(pending[j].t<=0){SPAWN[pending[j].k]();pending.splice(j,1);}}
+  const plan=enemyPlan();
+  if(plan&&enemies.length===0&&pending.length===0){
     enemyT-=dt;
     if(enemyT<=0){
-      const kind=nextEnemy&&pool.includes(nextEnemy)?nextEnemy:pool[Math.floor(Math.random()*pool.length)];
+      const pick=[];
+      if(nextEnemy&&plan.kinds.includes(nextEnemy))pick.push(nextEnemy);
+      if(plan.kinds.length===2&&plan.n===2){for(const k of plan.kinds)if(!pick.includes(k))pick.push(k);}
+      const rest=plan.kinds.filter(k=>!pick.includes(k));
+      while(pick.length<plan.n&&rest.length)pick.push(rest.splice(Math.floor(Math.random()*rest.length),1)[0]);
       nextEnemy=null;
-      if(kind==='dog')spawnDog();else if(kind==='crow')spawnCrows();else if(kind==='snake')spawnSnake();else spawnEagle();
-      enemyT=Math.max(.9,2.6-(level-UNLOCK.dog)*.07)*(0.8+Math.random()*.5);
+      pick.forEach((k,j)=>pending.push({k,t:j*.75}));
+      enemyT=Math.max(.9,2.6-(Math.min(level,MIX_START)-UNLOCK.dog)*.07)*(0.8+Math.random()*.5)+(pick.length-1)*.4;
     }
   }
 
@@ -612,6 +793,11 @@ function step(dt){
   // Gegner
   for(let i=enemies.length-1;i>=0;i--){
     const e=enemies[i];
+    if(GROUND_NEW.includes(e.kind)){
+      if(e.warn>0){e.warn-=dt;if(e.warn<=0)SFX[WARN_SND[e.kind]]();continue;}
+      if(stepGround(e,i,dt,cx,cy)==='stop')return;
+      continue;
+    }
     if(e.kind==='dog'){
       if(e.warn>0){e.warn-=dt;if(e.warn<=0)SFX.bark();continue;}
       e.x+=e.dir*e.sp*dt;e.run+=dt*16;
@@ -704,7 +890,7 @@ function step(dt){
         e.x+=e.vx*dt;e.y+=e.vy*dt;
         if(Math.hypot(e.x-cx,e.y-cy)<36*S){
           if(power>0||swipe>0){enemies.splice(i,1);kick(e,e.x,e.y,20,KL());continue;}
-          if(!e.hitCat&&inv<=0){e.hitCat=true;hurt(e.x,e.y,'KRAAH!');if(state!=='play')return;}
+          if(!e.hitCat&&inv<=0){e.hitCat=true;hurt(e.x,e.y,'KRAAH!',2);if(state!=='play')return;}
         }
         if(e.phase==='dive'&&e.y>=e.ty){
           e.phase='up';e.vy=-Math.abs(e.vy)*.85;
@@ -1315,6 +1501,122 @@ function drawDog(d,x,y){
   ctx.restore();
 }
 
+// ---------- Kröte, Fuchs, Igel, Dachs ----------
+function drawGround(e,x,y){
+  if(e.kind==='toad')drawToad(e,x,y);else if(e.kind==='fox')drawFox(e,x,y);
+  else if(e.kind==='hedgehog')drawHedgehog(e,x,y);else drawBadger(e,x,y);
+}
+function drawToad(e,x,y){
+  const jy=e.jy||0,air=jy>2*S;
+  ctx.save();ctx.translate(x,y-jy);ctx.scale(e.dir*S,S);
+  // Zunge
+  if(e.tongue>=0){
+    const L=Math.sin(Math.PI*Math.min(1,e.tongue))*110;
+    ctx.lineCap='round';ctx.strokeStyle=INK;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(20,-12);ctx.lineTo(22+L,-13);ctx.stroke();
+    ctx.strokeStyle='#ff7aa0';ctx.lineWidth=4.5;ctx.stroke();
+    ctx.beginPath();ctx.arc(24+L,-13,5.5,0,7);ctx.fillStyle='#ff7aa0';ctx.fill();outline(2.5);ctx.stroke();
+  }
+  // Hinterbein
+  ctx.fillStyle='#7d6b32';outline(3);
+  ctx.beginPath();if(air)ctx.ellipse(-25,-5,14,5,.35,0,7);else ctx.ellipse(-15,-6,12,8,0,0,7);ctx.fill();ctx.stroke();
+  // Körper mit hellem Bauch und Warzen
+  const body=()=>{ctx.beginPath();ctx.ellipse(0,-15,24,14,0,0,7);};
+  body();ctx.fillStyle='#9c8a45';ctx.fill();
+  ctx.save();body();ctx.clip();ctx.fillStyle='#e2d293';ctx.beginPath();ctx.ellipse(7,-3,19,7,0,0,7);ctx.fill();ctx.restore();
+  body();outline(3);ctx.stroke();
+  ctx.fillStyle='#6d5c26';
+  for(const [wx,wy,wr] of [[-11,-22,2.7],[-2,-25,2.1],[-16,-14,2.3],[3,-19,1.8],[-7,-16,1.6],[-19,-21,1.7]]){ctx.beginPath();ctx.arc(wx,wy,wr,0,7);ctx.fill();}
+  // Vorderbein
+  ctx.fillStyle='#8c7a3a';ctx.beginPath();ctx.ellipse(15,air?-2:-4,5,7.5,air?-.6:0,0,7);ctx.fill();outline(3);ctx.stroke();
+  // Auge oben (goldene Iris, quer liegende Pupille, mürrisches Lid)
+  ctx.beginPath();ctx.arc(12,-27,7.5,0,7);ctx.fillStyle='#9c8a45';ctx.fill();outline(3);ctx.stroke();
+  ctx.beginPath();ctx.arc(13,-27,4.6,0,7);ctx.fillStyle='#eaa92a';ctx.fill();
+  ctx.fillStyle=INK;ctx.beginPath();ctx.ellipse(13.6,-27,3,1.4,0,0,7);ctx.fill();
+  outline(2.6);ctx.beginPath();ctx.moveTo(5.5,-31.5);ctx.lineTo(19.5,-29);ctx.stroke();
+  // breites Maul
+  outline(2.4);ctx.beginPath();ctx.moveTo(22.5,-12);ctx.quadraticCurveTo(14,-8.5,5,-12);ctx.stroke();
+  ctx.restore();
+}
+function drawFox(e,x,y){
+  const jy=e.jy||0,air=jy>6*S,p=e.lp||0,tilt=air?(.5-p)*.5:0;
+  ctx.save();ctx.translate(x,y-jy);ctx.scale(e.dir*S,S);ctx.translate(0,-28);ctx.rotate(-tilt);ctx.translate(0,28);
+  const OR='#ec7a2c',DK='#2a1d18';
+  // buschiger Schwanz mit weisser Spitze
+  const tail=()=>{ctx.beginPath();ctx.moveTo(-24,-32);ctx.quadraticCurveTo(-46,-44+(air?-4:8),-64,-32+(air?-10:6));ctx.quadraticCurveTo(-50,-20,-24,-24);ctx.closePath();};
+  tail();ctx.fillStyle=OR;ctx.fill();
+  ctx.save();tail();ctx.clip();ctx.fillStyle='#fffdf6';ctx.beginPath();ctx.arc(-64,-32+(air?-10:6),12,0,7);ctx.fill();ctx.restore();
+  tail();outline(3);ctx.stroke();
+  // Beine: im Sprung gestreckt, am Boden darunter
+  ctx.fillStyle=DK;outline(3);
+  const legs=air?[[24,-24,-1.1],[18,-22,-1.0],[-20,-22,1.1],[-14,-21,1.0]]:[[18,-10,0],[10,-10,0],[-12,-10,0],[-20,-10,0]];
+  for(const [lx,ly,a] of legs){ctx.beginPath();ctx.ellipse(lx,ly,4.5,11,a,0,7);ctx.fill();ctx.stroke();}
+  // Körper
+  ctx.beginPath();ctx.ellipse(0,-30,28,12,0,0,7);ctx.fillStyle=OR;ctx.fill();ctx.stroke();
+  ctx.fillStyle='#fffdf6';ctx.beginPath();ctx.ellipse(17,-25,9,7,0,0,7);ctx.fill();
+  // Kopf mit spitzer Schnauze und Ohren (Ohren hinter dem Kopf, dunkle Spitzen)
+  for(const [a,b,c] of [[[21,-47],[22,-67],[32,-51]],[[30,-52],[38,-66],[41,-48]]]){
+    ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.lineTo(...c);ctx.closePath();ctx.fillStyle=OR;ctx.fill();
+    ctx.save();ctx.clip();ctx.fillStyle=DK;ctx.beginPath();ctx.arc(b[0],b[1],8,0,7);ctx.fill();ctx.restore();
+    ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.lineTo(...c);ctx.closePath();outline(3);ctx.stroke();
+  }
+  const head=()=>{ctx.beginPath();ctx.moveTo(18,-44);ctx.quadraticCurveTo(22,-55,34,-52);ctx.quadraticCurveTo(42,-49,56,-40);ctx.quadraticCurveTo(44,-31,30,-31);ctx.quadraticCurveTo(18,-33,18,-44);ctx.closePath();};
+  head();ctx.fillStyle=OR;ctx.fill();
+  ctx.save();head();ctx.clip();ctx.fillStyle='#fffdf6';
+  ctx.beginPath();ctx.moveTo(20,-38);ctx.quadraticCurveTo(38,-41,58,-40);ctx.lineTo(58,-28);ctx.lineTo(18,-28);ctx.closePath();ctx.fill();ctx.restore();
+  head();outline(3);ctx.stroke();
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(55.5,-40,3.3,0,7);ctx.fill();
+  // listiges Auge mit Glanzpunkt und schräger Braue
+  ctx.beginPath();ctx.ellipse(37,-45,2.8,3.3,0,0,7);ctx.fill();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(37.8,-46.2,1,0,7);ctx.fill();
+  outline(2.4);ctx.beginPath();ctx.moveTo(32,-51);ctx.lineTo(42,-48.5);ctx.stroke();
+  ctx.restore();
+}
+function drawHedgehog(e,x,y){
+  ctx.save();ctx.translate(x,y-20*S);ctx.scale(S,S);
+  // Tempo-Striche hinter der Kugel
+  ctx.strokeStyle='rgba(27,20,38,.45)';ctx.lineWidth=3;ctx.lineCap='round';
+  for(const [ly,ll] of [[-8,16],[2,22],[12,14]]){ctx.beginPath();ctx.moveTo(-e.dir*30,ly);ctx.lineTo(-e.dir*(30+ll),ly);ctx.stroke();}
+  ctx.rotate(e.rot||0);
+  // Stacheln
+  for(let k=0;k<18;k++){
+    const a=k/18*Math.PI*2,a1=a-.17,a2=a+.17;
+    ctx.beginPath();ctx.moveTo(Math.cos(a1)*15,Math.sin(a1)*15);ctx.lineTo(Math.cos(a)*27,Math.sin(a)*27);ctx.lineTo(Math.cos(a2)*15,Math.sin(a2)*15);ctx.closePath();
+    ctx.fillStyle=k%2?'#5b4331':'#8d6a4b';ctx.fill();outline(2.4);ctx.stroke();
+  }
+  ctx.beginPath();ctx.arc(0,0,17,0,7);ctx.fillStyle='#7a5a3e';ctx.fill();outline(3);ctx.stroke();
+  // eingerolltes Gesicht: hellbraune Schnauze mit Nase und zugekniffenem Auge
+  ctx.beginPath();ctx.ellipse(8,4,8,6,.4,0,7);ctx.fillStyle='#e6c8a0';ctx.fill();outline(2.4);ctx.stroke();
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(14,7,2.6,0,7);ctx.fill();
+  outline(2);ctx.beginPath();ctx.moveTo(1,-3);ctx.quadraticCurveTo(4,-5,7,-3);ctx.stroke();
+  ctx.restore();
+}
+function drawBadger(e,x,y){
+  const r=e.run||0,lp=e.pause>0?0:Math.sin(r)*6,sq=e.pause>0?Math.sin(e.pause*30)*.06:0;
+  ctx.save();ctx.translate(x,y);ctx.scale(e.dir*S*(1+sq),S*(1-sq));
+  const GR='#8e9198',DK='#26262b';
+  // Beine
+  ctx.fillStyle=DK;outline(3);
+  for(const [lx,o] of [[-20,lp],[-10,-lp],[12,-lp],[22,lp]]){ctx.beginPath();ctx.ellipse(lx+o,-7,6,8,0,0,7);ctx.fill();ctx.stroke();}
+  // Körper: breit, grau, dunkler Rücken
+  const body=()=>{ctx.beginPath();ctx.ellipse(0,-22,32,15,0,0,7);};
+  body();ctx.fillStyle=GR;ctx.fill();
+  ctx.save();body();ctx.clip();ctx.fillStyle='#6c6f76';ctx.fillRect(-34,-40,68,12);ctx.fillStyle=DK;ctx.fillRect(-34,-14,68,10);ctx.restore();
+  body();outline(3);ctx.stroke();
+  ctx.fillStyle=GR;ctx.beginPath();ctx.moveTo(-30,-26);ctx.lineTo(-40,-22);ctx.lineTo(-30,-18);ctx.closePath();ctx.fill();ctx.stroke();
+  // Kopf: weiss mit schwarzem Streifen über dem Auge
+  ctx.save();ctx.translate(30,-26);
+  ctx.fillStyle=GR;ctx.beginPath();ctx.arc(-7,-10,5,0,7);ctx.fill();outline(2.5);ctx.stroke();
+  const head=()=>{ctx.beginPath();ctx.moveTo(-10,-10);ctx.quadraticCurveTo(4,-14,18,2);ctx.quadraticCurveTo(6,10,-10,8);ctx.quadraticCurveTo(-16,0,-10,-10);ctx.closePath();};
+  head();ctx.fillStyle='#fbfaf6';ctx.fill();
+  ctx.save();head();ctx.clip();ctx.fillStyle=DK;
+  ctx.beginPath();ctx.moveTo(-14,-6);ctx.lineTo(16,-2);ctx.lineTo(16,3);ctx.lineTo(-14,4);ctx.closePath();ctx.fill();ctx.restore();
+  head();outline(3);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(3,-1.5,2.2,0,7);ctx.fill();
+  ctx.fillStyle=INK;ctx.beginPath();ctx.arc(17.5,2,3,0,7);ctx.fill();
+  ctx.restore();
+  ctx.restore();
+}
+
 function drawEagle(e,x,y){
   ctx.save();ctx.translate(x,y);ctx.scale((e.face||1)*S,S);
   if(e.phase==='dive'||e.phase==='up')ctx.rotate(Math.atan2(e.vy,Math.abs(e.vx)||1)*.6);
@@ -1439,6 +1741,10 @@ function drawWarn(e,col){
 }
 
 function drawEnemy(e){
+  if(GROUND_NEW.includes(e.kind)){
+    if(e.warn>0){drawWarn(e,{toad:'#c3d15e',fox:'#ff9a4a',hedgehog:'#d2a878',badger:'#d5d8de'}[e.kind]);return;}
+    drawGround(e,e.x,groundY());return;
+  }
   if(e.kind==='dog'){
     if(e.warn>0){drawWarn(e,'#ffd23f');return;}
     drawDog(e,e.x,groundY());
@@ -1471,9 +1777,9 @@ function drawKicked(k,now){
   const o=k.obj;
   if(k.squash){ // plattgedrückt, mit kreisenden Sternchen
     ctx.save();ctx.scale(1.22,.55);
-    if(o.kind==='dog')drawDog(o,0,0);else drawCrow({...o,swoop:-1,flap:0},0,0);
+    if(o.kind==='dog')drawDog(o,0,0);else if(GROUND_NEW.includes(o.kind))drawGround({...o,jy:0,tongue:-1,pause:0},0,0);else drawCrow({...o,swoop:-1,flap:0},0,0);
     ctx.restore();
-    const top=(o.kind==='dog'?-40:-22)*S;
+    const top=(o.kind==='dog'||o.kind==='fox'||o.kind==='badger'?-40:-22)*S;
     for(let j=0;j<3;j++){
       const a=now*7+j*2.1;
       star(Math.cos(a)*22*S,top+Math.sin(a)*6*S,6*S);
@@ -1484,6 +1790,7 @@ function drawKicked(k,now){
   else if(o.kind==='snake')drawSnake({...o,strike:-1},0,0,10*S);
   else if(o.kind==='crow')drawCrow({...o,swoop:-1},0,0);
   else if(o.kind==='eagle')drawEagle({...o,phase:'up',vx:1,vy:0},0,0);
+  else if(GROUND_NEW.includes(o.kind))drawGround({...o,jy:0,tongue:-1,pause:0},0,20*S);
   else drawItem({...o,rot:0},0,0,now);
   ctx.restore();
 }
@@ -1562,7 +1869,7 @@ function render(now){
     const x=o.x+(o.type==='fish'||o.type==='super'?Math.sin(o.wob)*10*S:0);
     drawItem(o,x,o.y,now);
   }
-  for(const e of enemies)if(e.kind==='dog'||e.kind==='snake')drawEnemy(e);
+  for(const e of enemies)if(e.kind!=='eagle'&&e.kind!=='crow')drawEnemy(e);
   if(cat){
     if(ghost>0){ // halbtransparent, kurz vor Ende flackernd
       ctx.save();ctx.globalAlpha=ghost<.7&&Math.floor(ghost*10)%2===0?.6:.3+.08*Math.sin(now*10);
@@ -1596,17 +1903,36 @@ function loop(ts){
     if(cat.air){cat.jy+=cat.vy*dt;cat.vy-=GRAV()*dt;if(cat.jy<=0){cat.jy=0;cat.air=false;}}
     stepFx(dt);
   }
+  if(state==='start'&&!$('start').hidden)drawPreviews(ts/1000);
   render(ts/1000);
 }
 
+// Figuren-Vorschau im Startmenü: die Katze wird kurz in eine Ecke der Spielfläche gezeichnet
+// und von dort in die kleine Vorschau kopiert (die Spielfläche wird danach sowieso neu gezeichnet).
+const PV=[['tabby','pvTabby'],['mali','pvMali']];
+function drawPreviews(now){
+  const dpr=cv.width/W,oS=S,oSkin=skin,pw=150,ph=120;
+  if(W<pw||H<ph)return;
+  for(const [sk,id] of PV){
+    const pc=$(id),w=Math.round(pc.clientWidth*dpr),h=Math.round(pc.clientHeight*dpr);
+    if(w<4||h<4)continue;
+    if(pc.width!==w||pc.height!==h){pc.width=w;pc.height=h;}
+    ctx.clearRect(0,0,pw,ph);
+    S=1.45;skin=sk;
+    const sel=sk===oSkin, c={x:pw/2-6,y:ph-12,tx:0,face:1,fs:1,run:sel?now*9:0,jy:0,vy:0,air:false,vx:sel?60*Math.sin(now*2)*0:0};
+    drawCat(c,now+(sk==='mali'?.7:0));
+    S=oS;skin=oSkin;
+    const g=pc.getContext('2d');g.clearRect(0,0,w,h);g.drawImage(cv,0,0,pw*dpr,ph*dpr,0,0,w,h);
+  }
+}
 function begin(){
   if(W<2||H<2)resize();
   reset();state='play';startBest=best;
   $('start').hidden=true;$('over').hidden=true;$('hud').hidden=false;$('abil').hidden=false;$('homeBtn').hidden=false;updAbil();
-  SFX.init();setTimeout(()=>MUSIC.start(),60);
+  musicOn();
 }
 function gameOver(){
-  state='over';items=[];enemies=[];power=0;ghost=0;swipe=0;$('abil').hidden=true;$('homeBtn').hidden=true;MUSIC.stop();
+  state='over';items=[];enemies=[];power=0;ghost=0;swipe=0;$('abil').hidden=true;$('homeBtn').hidden=true;
   const isNew=score>0&&score>=best&&score>startBest;
   $('overTitle').textContent=(skin==='mali'?'Mali':'Ronaldo')+' ist k.o.!';
   $('final').textContent=score;
@@ -1699,16 +2025,16 @@ function useAbil(){
   if(abilCd>0){hit(cat.x,cat.y-cat.jy-90*S,'NOCH '+Math.ceil(abilCd)+' S','#fffdf6');return;}
   if(energy<cost){hit(cat.x,cat.y-cat.jy-90*S,'ZU WENIG ENERGIE','#fffdf6');return;}
   energy-=cost;updAbil();
-  if(skin==='mali'){ghost=3;SFX.vanish();hit(cat.x,cat.y-cat.jy-90*S,'UNSICHTBAR!','#a5c6dc');return;}
+  if(skin==='mali'){ghost=GHOST_T;SFX.vanish();hit(cat.x,cat.y-cat.jy-90*S,'UNSICHTBAR!','#a5c6dc');return;}
   // Ronaldo: Pfotenhieb trifft alles direkt vor ihm
   swipe=SWIPE_T;abilCd=ABIL_CD;updAbil();SFX.paw();
   if(!swipeHits())hit(cat.x+(cat.face||1)*40*S,cat.y-cat.jy-60*S,'ZACK!','#fffdf6');
 }
-const SWIPE_T=.4;
+const SWIPE_T=.4,GHOST_T=5;
 function swipeHits(){
   const d=cat.face||1, ccy=cat.y-cat.jy-30*S;
   const inReach=(x,y)=>{const f=(x-cat.x)*d;return f>-35*S&&f<115*S&&Math.abs(y-ccy)<82*S;};
-  const PTS={dog:15,crow:20,snake:15,eagle:20};
+  const PTS={dog:15,crow:20,snake:15,eagle:20,toad:15,fox:20,hedgehog:20,badger:20};
   let any=false;
   for(let i=enemies.length-1;i>=0;i--){
     const e=enemies[i];
@@ -1716,6 +2042,8 @@ function swipeHits(){
     let x=e.x,y=e.y;
     if(e.kind==='dog'){y=groundY()-26*S;}
     else if(e.kind==='snake'){const h=snakeHead(e);x=h.x;y=h.y;}
+    else if(e.kind==='fox'){y=groundY()-28*S-e.jy;}
+    else if(GROUND_NEW.includes(e.kind)){y=groundY()-20*S-(e.jy||0);}
     if(inReach(x,y)){enemies.splice(i,1);kick(e,x,y,PTS[e.kind]||10,'PFOTENHIEB!');any=true;}
   }
   for(let i=items.length-1;i>=0;i--){
@@ -1735,31 +2063,43 @@ function setStyle(v){
 function setFangs(v){
   fangs=v;try{localStorage.setItem('ccg-fangs',v?'1':'0')}catch(e){}
   $('fangBtn').setAttribute('aria-pressed',v?'true':'false');
-  $('fangBtn').textContent=v?'Fangzähne: an':'Fangzähne: aus';
+  $('fangBtn').textContent=v?'Zähne: an':'Zähne: aus';
 }
 function setSkin(s){
   if(s!=='tabby'&&s!=='mali')s='tabby';
   skin=s;try{localStorage.setItem('ccg-skin3',s)}catch(e){}
-  for(const b of document.querySelectorAll('.skin button[data-skin]'))b.setAttribute('aria-pressed',b.dataset.skin===s?'true':'false');
+  for(const b of document.querySelectorAll('[data-skin]'))b.setAttribute('aria-pressed',b.dataset.skin===s?'true':'false');
 }
-for(const b of document.querySelectorAll('.skin button[data-skin]'))b.addEventListener('click',()=>setSkin(b.dataset.skin));
+for(const b of document.querySelectorAll('[data-skin]'))b.addEventListener('click',()=>setSkin(b.dataset.skin));
 setSkin(skin);
 $('fangBtn').addEventListener('click',()=>setFangs(!fangs));setFangs(fangs);
 function setSound(v){SFX.on=v;$('soundBtn').setAttribute('aria-pressed',v?'true':'false');$('soundBtn').textContent=v?'Ton: an':'Ton: aus';if(v)SFX.init();}
 $('soundBtn').addEventListener('click',()=>setSound(!SFX.on));setSound(SFX.on);
-function setMusic(v){MUSIC.on=v;$('musicBtn').setAttribute('aria-pressed',v?'true':'false');$('musicBtn').textContent=v?'Musik: an':'Musik: aus';}
+function setMusic(v){MUSIC.on=v;if(v)musicOn();$('musicBtn').setAttribute('aria-pressed',v?'true':'false');$('musicBtn').textContent=v?'Musik: an':'Musik: aus';}
 $('musicBtn').addEventListener('click',()=>setMusic(!MUSIC.on));setMusic(MUSIC.on);
+// Fähigkeiten-Knopf links oder rechts unten (für Links- und Rechtshänder)
+let btnSide='r';try{btnSide=localStorage.getItem('ccg-side')==='l'?'l':'r'}catch(e){}
+function setSide(v){btnSide=v;try{localStorage.setItem('ccg-side',v)}catch(e){}
+  abilBtn.classList.toggle('side-r',v==='r');abilBtn.classList.toggle('side-l',v==='l');
+  $('sideBtn').textContent=v==='r'?'Knopf: rechts':'Knopf: links';}
+$('sideBtn').addEventListener('click',()=>setSide(btnSide==='r'?'l':'r'));setSide(btnSide);
 // Musik pausieren, wenn die App in den Hintergrund geht
-document.addEventListener('visibilitychange',()=>{if(document.hidden)MUSIC.stop();else if(state==='play')MUSIC.start();});
-// Audio darf erst nach einer Nutzeraktion starten
-for(const ev of ['pointerdown','keydown','touchend'])addEventListener(ev,()=>SFX.init(),{passive:true});
+// Musik läuft ab dem Start der App (Menü und Spiel). Browser erlauben Ton oft erst nach der ersten Berührung:
+// dann startet sie spätestens beim ersten Antippen. In der App (Android/iOS) ist das bereits freigeschaltet.
+function musicOn(){SFX.init();if(MUSIC.on&&!document.hidden&&!MUSIC.playing)MUSIC.start();}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)MUSIC.stop();else musicOn();});
+window.__pauseAll=()=>MUSIC.stop();window.__resumeAll=()=>musicOn();
+for(const ev of ['pointerdown','keydown','touchend'])addEventListener(ev,musicOn,{passive:true});
+musicOn();
+$('helpBtn').addEventListener('click',()=>{$('start').hidden=true;$('help').hidden=false;});
+$('helpBack').addEventListener('click',()=>{$('help').hidden=true;$('start').hidden=false;});
 $('go').addEventListener('click',begin);
 $('again').addEventListener('click',begin);
 function goHome(){
   if(tapTimer){clearTimeout(tapTimer);tapTimer=null;}
   state='start';items=[];enemies=[];kicked=[];power=0;ghost=0;swipe=0;abilCd=0;keys.l=keys.r=false;
   $('hud').hidden=true;$('abil').hidden=true;$('homeBtn').hidden=true;$('over').hidden=true;$('start').hidden=false;
-  MUSIC.stop();
+  $('help').hidden=true;
   showBest();
 }
 $('homeBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();goHome();});
