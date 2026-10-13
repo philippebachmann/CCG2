@@ -48,6 +48,13 @@ public class MainActivity extends Activity {
         if (hasFocus) hideSystemBars();
     }
 
-    @Override protected void onPause() { super.onPause(); web.onPause(); }
-    @Override protected void onResume() { super.onResume(); web.onResume(); }
+    // Musik anhalten, wenn die App in den Hintergrund geht, und danach weiterspielen
+    @Override protected void onPause() {
+        web.evaluateJavascript("window.__pauseAll&&window.__pauseAll()", null);
+        super.onPause(); web.onPause();
+    }
+    @Override protected void onResume() {
+        super.onResume(); web.onResume();
+        web.evaluateJavascript("window.__resumeAll&&window.__resumeAll()", null);
+    }
 }
