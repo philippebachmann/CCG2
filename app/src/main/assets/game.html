@@ -283,14 +283,14 @@ kbd{font-family:var(--body);font-weight:700;font-size:.75rem;background:var(--su
       <li><b>Ab Level 21</b> kommt der Dachs. Er kann einmal plötzlich umdrehen. <b>Kostet 2 Leben</b> und hält dich 5 Sekunden fest.</li>
       <li><b>Ab Level 24</b> stürzen Adler herab. Lauf weg, wenn das Fadenkreuz erscheint. <b>Kostet 3 Leben!</b></li>
       <li><b>Ab Level 27</b> kommen Hund und Krähe gemeinsam. Alle 3 Level stösst ein weiterer Gegner zur Bande, ab Level 39 greifen drei auf einmal an.</li>
-      <li><b>Joker Marisa:</b> Holst du 100 Punkte am Stück ohne Schaden, lädt sich ein Joker oben links auf. Joker sind stapelbar, die Zahl am Marisa-Knopf zeigt, wie viele du hast. Tippst du darauf (am Computer Taste J), erscheint Marisa oben und wirft dir ein Herz zu. Fang es: +1 Leben!</li>
+      <li><b>Joker Marisa:</b> Holst du 100 Punkte am Stück ohne Schaden, lädt sich ein Joker oben links auf. Joker sind stapelbar, die Zahl am Marisa-Knopf zeigt, wie viele du hast. Tippst du darauf (am Computer Taste R), erscheint Marisa oben und wirft dir ein Herz zu. Fang es: +1 Leben!</li>
       <li><b>Festgehalten?</b> Ronaldos Pfotenhieb oder die Superkraft befreit sofort, Mali entwischt, wenn sie sich unsichtbar macht.</li>
       <li><b>Draufspringen:</b> Lande von oben auf Hund, Krähe, Kröte, Fuchs oder Dachs, dann ist er besiegt (+15 bis +20). Nicht auf den Igel!</li>
       <li><b>Spezialfähigkeit:</b> Ronaldo besiegt mit dem <b>Pfotenhieb</b> Gegner vor ihm (5 Energie). Mali macht sich <b>5 Sekunden unsichtbar</b> und unverwundbar (10 Energie). Jeder Fisch bringt +5 Energie, maximal 100. Danach 3 Sekunden Abklingzeit.</li>
       <li><b>Superfisch:</b> 10 Sekunden Superkräfte, kick alles weg! Dazu +50 Energie.</li>
       <li><b>9 Leben</b> wie jede Katze. Alle 5 Level gibt es ein verlorenes zurück.</li>
     </ul>
-    <div class="keys"><b>Am Computer:</b> Katze folgt der Maus, Klick springt. Oder <kbd>←</kbd> <kbd>→</kbd> laufen, <kbd>Leertaste</kbd> springen, <kbd>E</kbd> Spezialfähigkeit.</div>
+    <div class="keys"><b>Am Computer:</b> Katze folgt der Maus, Klick springt. Oder <kbd>←</kbd> <kbd>→</kbd> laufen, <kbd>Leertaste</kbd> springen, <kbd>E</kbd> Spezialfähigkeit, <kbd>R</kbd> Joker Marisa.</div>
     <button type="button" class="small" id="helpBack">ZURÜCK</button>
   </div>
 
@@ -1570,12 +1570,15 @@ function drawCat(c,now){
   if(blink)return;
   const cy=c.y-c.jy;
   if(power>0){
-    const fade=power<2&&Math.floor(power*8)%2===0;
-    if(!fade){
-      const hue=(now*300)%360;
-      const g=ctx.createRadialGradient(c.x,cy-28*S,8*S,c.x,cy-28*S,62*S);
-      g.addColorStop(0,`hsla(${hue},100%,70%,.75)`);g.addColorStop(1,`hsla(${(hue+90)%360},100%,60%,0)`);
-      ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,cy-28*S,62*S,0,7);ctx.fill();
+    // Superkraft-Aura; in den letzten 3 Sekunden kräftiges Blinken, das immer schneller wird
+    const ending=power<3, on=!ending||Math.floor(power*(power<1.2?16:power<2?11:7))%2===0;
+    if(on){
+      const hue=(now*300)%360,R=(ending?78:62)*S;
+      const g=ctx.createRadialGradient(c.x,cy-28*S,8*S,c.x,cy-28*S,R);
+      g.addColorStop(0,ending?'rgba(255,255,255,.95)':`hsla(${hue},100%,70%,.75)`);
+      g.addColorStop(.45,`hsla(${hue},100%,${ending?65:70}%,${ending?.85:.5})`);
+      g.addColorStop(1,`hsla(${(hue+90)%360},100%,60%,0)`);
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(c.x,cy-28*S,R,0,7);ctx.fill();
     }
   }
   if(skin==='sketch'&&sketchImg.complete&&sketchImg.naturalWidth){drawSketchCat(c,cy,now);return;}
@@ -2191,16 +2194,37 @@ function drawBanner(){
 }
 function drawPowerBar(now){
   if(power<=0)return;
-  const w=170*S,h=16*S,x=W/2-w/2,y=72;
+  // gut sichtbar unter der Regenwolke: grosse Regenbogen-Leiste mit Superfisch-Symbol, Sekunden-Zähler und Glanz
+  const w=Math.min(W-40*S,280*S),h=30*S,x=W/2-w/2,y=cloudBottom()+70*S;
+  const left=power/POWER_TIME,warn=power<3,blink=warn&&Math.floor(now*6)%2===0;
   ctx.save();
-  ctx.fillStyle='#fffdf6';ctx.beginPath();ctx.roundRect(x,y,w,h,h/2);ctx.fill();
-  const g=ctx.createLinearGradient(x,0,x+w,0);
+  // Schein
   const hue=(now*200)%360;
-  g.addColorStop(0,`hsl(${hue},100%,60%)`);g.addColorStop(1,`hsl(${(hue+120)%360},100%,60%)`);
-  ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(x,y,Math.max(h,w*power/POWER_TIME),h,h/2);ctx.fill();
-  ctx.beginPath();ctx.roundRect(x,y,w,h,h/2);outline(3);ctx.stroke();
-  ctx.font=Math.round(15*S)+'px Bangers, Impact, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillStyle=INK;ctx.fillText('SUPERKRAFT '+Math.ceil(power)+'s',W/2,y+h/2+1);
+  ctx.shadowColor=`hsla(${hue},100%,60%,.85)`;ctx.shadowBlur=18*S;
+  ctx.fillStyle='#fffdf6';ctx.beginPath();ctx.roundRect(x,y,w,h,h/2);ctx.fill();
+  ctx.shadowBlur=0;
+  // Regenbogen-Füllung
+  const g=ctx.createLinearGradient(x,0,x+w,0);
+  for(let k=0;k<=4;k++)g.addColorStop(k/4,`hsl(${(hue+k*70)%360},100%,${blink?70:58}%)`);
+  ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,h/2);ctx.clip();
+  ctx.fillStyle=g;ctx.fillRect(x,y,Math.max(h,w*left),h);
+  // wandernder Glanzstreifen
+  const sx=x+((now*160*S)%(w+80*S))-40*S;ctx.fillStyle='rgba(255,255,255,.45)';
+  ctx.beginPath();ctx.moveTo(sx,y);ctx.lineTo(sx+18*S,y);ctx.lineTo(sx+6*S,y+h);ctx.lineTo(sx-12*S,y+h);ctx.closePath();ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(x,y+3*S,w,h*.28);
+  ctx.restore();
+  ctx.beginPath();ctx.roundRect(x,y,w,h,h/2);outline(3.5);ctx.stroke();
+  // Superfisch-Symbol links, leicht über den Rand
+  ctx.save();ctx.translate(x+6*S,y+h/2);ctx.rotate(Math.sin(now*6)*.15);
+  ctx.fillStyle='#ffd23f';ctx.beginPath();ctx.arc(0,0,19*S,0,7);ctx.fill();outline(3);ctx.stroke();
+  ctx.scale(.62,.62);drawItem({type:'super',wob:now*4,rot:0},0,0,now);ctx.restore();
+  // Text mit Kontur
+  const pulse=1+(warn?Math.sin(now*14)*.08:0);
+  ctx.translate(W/2+10*S,y+h/2+1);ctx.scale(pulse,pulse);
+  ctx.font=Math.round(20*S)+'px Bangers, Impact, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  const txt='SUPERKRAFT '+Math.ceil(power)+' s';
+  ctx.lineJoin='round';ctx.lineWidth=5*S;ctx.strokeStyle=INK;ctx.strokeText(txt,0,0);
+  ctx.fillStyle='#fffdf6';ctx.fillText(txt,0,0);
   ctx.restore();
 }
 
@@ -2305,7 +2329,7 @@ addEventListener('keydown',e=>{
   if(e.key==='ArrowRight'||e.key==='d'){keys.r=true;mouseFollow=false;e.preventDefault();}
   if(state==='play'&&e.key==='Escape'){e.preventDefault();goHome();return;}
   if(state==='play'&&(e.key==='e'||e.key==='E'||e.key==='Shift')){e.preventDefault();useAbil();return;}
-  if(state==='play'&&(e.key==='j'||e.key==='J')){e.preventDefault();useJoker();return;}
+  if(state==='play'&&(e.key==='r'||e.key==='R'||e.key==='j'||e.key==='J')){e.preventDefault();useJoker();return;}
   if(state==='play'&&(e.key==='ArrowUp'||e.key==='w'||e.key===' ')){e.preventDefault();jump();}
   else if((e.key===' '||e.key==='Enter')&&state!=='play'){e.preventDefault();begin();}
 });
