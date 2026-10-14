@@ -1,0 +1,22 @@
+NINE LIVES – Attack or hide!  ·  Android-App (APK) über GitHub bauen
+
+1. Auf github.com einloggen und ein neues Repository anlegen (z. B. "nine-lives").
+   Tipp: Wenn du schon ein altes Repository hast, kannst du es löschen oder ein neues nehmen.
+2. Diese ZIP entpacken. Im Repository "Add file" > "Upload files" wählen und den GESAMTEN
+   entpackten Inhalt hineinziehen – inklusive des Ordners ".github" (am Mac evtl. mit
+   Cmd+Shift+Punkt sichtbar machen). Danach "Commit changes".
+   Falls ".github" nicht mit hochgeladen wird: im Repository "Add file" > "Create new file",
+   als Namen  .github/workflows/build-apk.yml  eintippen und den Inhalt der gleichnamigen Datei
+   aus dieser ZIP hineinkopieren.
+3. Reiter "Actions" öffnen. Der Ablauf "APK bauen" startet automatisch (ca. 3–5 Minuten).
+   Startet er nicht: links "APK bauen" anklicken > "Run workflow".
+4. Auf den fertigen Lauf (grüner Haken) tippen, unten bei "Artifacts" auf "NineLives-apk"
+   klicken. Die heruntergeladene ZIP enthält app-release.apk.
+
+INSTALLIEREN AUF DEM HANDY
+- APK aufs Android-Handy bringen (Mail, Google Drive, Kabel …) und antippen.
+- Beim ersten Mal "Installation aus unbekannten Quellen" erlauben.
+- Eine ältere Version wird direkt aktualisiert (gleiche App-Kennung, neue Versionsnummer 2.0).
+
+Hinweis: Die APK ist mit einem Test-Schlüssel signiert – das reicht für dich und Freunde.
+Für den Google Play Store brauchst du ein Entwicklerkonto und einen eigenen Schlüssel.
