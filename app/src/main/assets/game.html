@@ -2456,7 +2456,7 @@ function drawSketchCat(c,cy,now){
   ctx.save();
   ctx.translate(c.x,cy-hop+4*S);
   ctx.rotate(lean+wad);
-  ctx.scale(-(c.fs||c.face)*sx,sy);   // Skizze schaut nach links, darum gespiegelt für rechts
+  ctx.scale(-turnX(c)*sx,sy);   // Skizze schaut nach links, darum gespiegelt für rechts
   ctx.drawImage(sketchImg,-w*.5,-h,w,h);
   ctx.restore();
 }
@@ -2475,7 +2475,7 @@ function drawTabbyCat(c,cy,now,big,fv){
   const bob=c.air?0:Math.abs(Math.sin(c.run*.35))*-2.2*S*mv;
   const lean=Math.max(-.12,Math.min(.12,(c.vx||0)/(720*S)*.12));
   const sq=c.squash||0;
-  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale((c.fs||c.face)*S*(1+.12*sq),S*(1-.14*sq));
+  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale(turnX(c)*S*(1+.12*sq),S*(1-.14*sq));
   const lh=big?(c.air?3:5):(c.air?6:10); // kurze Beinchen
   const by=-(lh+(big?16:15));    // Körpermitte
   if(power>0){ // Umhang
@@ -2637,7 +2637,7 @@ function drawTabbyComic(c,cy,now,fv){
   const bob=c.air?0:Math.sin(c.run*.35)*2*S*mv;
   const lean=Math.max(-.14,Math.min(.14,(c.vx||0)/(720*S)*.14));
   const sq=c.squash||0;
-  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale((c.fs||c.face)*S*(1+.1*sq),S*(1-.12*sq));
+  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale(turnX(c)*S*(1+.1*sq),S*(1-.12*sq));
   if(power>0){
     const wv=Math.sin(now*14)*5;
     ctx.beginPath();ctx.moveTo(8,-34);ctx.quadraticCurveTo(-20,-44+wv,-46,-26+wv);ctx.lineTo(-38,-8-wv);ctx.quadraticCurveTo(-14,-14,6,-22);ctx.closePath();
@@ -2759,7 +2759,7 @@ function drawMali(c,cy,now,queen){
   const bob=c.air?0:Math.sin(c.run*.35)*2*S*mv;
   const lean=Math.max(-.14,Math.min(.14,(c.vx||0)/(720*S)*.14));
   const sq=c.squash||0;
-  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale((c.fs||c.face)*S*(1+.1*sq),S*(1-.12*sq));
+  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale(turnX(c)*S*(1+.1*sq),S*(1-.12*sq));
   if(power>0){
     const wv=Math.sin(now*14)*5;
     ctx.beginPath();ctx.moveTo(8,-34);ctx.quadraticCurveTo(-20,-44+wv,-46,-26+wv);ctx.lineTo(-38,-8-wv);ctx.quadraticCurveTo(-14,-14,6,-22);ctx.closePath();
@@ -2889,6 +2889,8 @@ function drawMali(c,cy,now,queen){
   ctx.restore();
   ctx.restore();
 }
+// Blickrichtung beim Umdrehen: nie dünner als 85 % – die Katze dreht sich, statt plattgedrückt zu werden
+function turnX(c){const f=c.fs||c.face||1,d=f<0?-1:1;return d*(.85+.15*Math.min(1,Math.abs(f)));}
 function drawCat(c,now){
   // Schatten bleibt am Boden
   const sh=Math.max(.35,1-c.jy/(200*S));
@@ -2915,7 +2917,7 @@ function drawCat(c,now){
   const mv=Math.min(1,Math.abs(c.vx||0)/(160*S));        // 0 = steht, 1 = rennt
   const bob=c.air?0:Math.sin(c.run*.35)*2*S*mv;
   const lean=Math.max(-.14,Math.min(.14,(c.vx||0)/(720*S)*.14)); // leicht in die Laufrichtung neigen
-  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale((c.fs||c.face)*S,S);
+  ctx.save();ctx.translate(c.x,cy);ctx.rotate(lean);ctx.scale(turnX(c)*S,S);
   // Umhang bei Superkraft
   if(power>0){
     const wv=Math.sin(now*14)*5;
@@ -3534,7 +3536,7 @@ function drawStatus(now){
     for(let k=0;k<26;k++){const a=k*.5+now*4,rr=3+k*.7;ctx.lineTo(cat.x+Math.cos(a)*rr*S,top-14*S+Math.sin(a)*rr*.45*S);}ctx.stroke();ctx.restore();
   }
   if(slowT>0){
-    ctx.save();ctx.translate(cat.x,cy);ctx.scale((cat.fs||1)*S,S);
+    ctx.save();ctx.translate(cat.x,cy);ctx.scale(turnX(cat)*S,S);
     for(const [x,y,a] of [[-22,-28,-1.0],[-15,-34,-.55],[-6,-36,-.15],[3,-35,.25],[-18,-22,-1.3]]){
       ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.moveTo(-3,0);ctx.lineTo(0,-13);ctx.lineTo(3,0);ctx.closePath();
       ctx.fillStyle='#6b4f36';ctx.fill();outline(1.6);ctx.stroke();ctx.restore();}
@@ -3887,11 +3889,12 @@ function loop(ts){
 // und von dort in die kleine Vorschau kopiert (die Spielfläche wird danach sowieso neu gezeichnet).
 const PV=[['tabby','pvTabby'],['mali','pvMali']];
 function drawPreviews(now){
-  const dpr=cv.width/W,oS=S,oSkin=skin,oInv=inv,pw=150,ph=120;inv=0;
-  if(W<pw||H<ph)return;
+  const dpr=cv.width/W,oS=S,oSkin=skin,oInv=inv;inv=0;
   for(const [sk,id] of PV){
     const pc=$(id),w=Math.round(pc.clientWidth*dpr),h=Math.round(pc.clientHeight*dpr);
     if(w<4||h<4)continue;
+    // Zeichenfläche im gleichen Seitenverhältnis wie die Vorschau – sonst wird die Katze verzerrt
+    const ph=120,pw=Math.min(W,Math.round(ph*w/h));if(W<pw||H<ph)continue;
     if(pc.width!==w||pc.height!==h){pc.width=w;pc.height=h;}
     ctx.clearRect(0,0,pw,ph);
     S=1.45;skin=sk;
@@ -4375,9 +4378,10 @@ function buildCast(){
   box.innerHTML=CAST.map(([k,cls,n,role,txt],i)=>'<div class="who '+cls+'"><canvas data-i="'+i+'"></canvas><b>'+n+'<small>'+role+'</small></b><p>'+txt+'</p></div>').join('');
 }
 function paintCast(){
-  const dpr=cv.width/W,oS=S,oSkin=skin,oInv=inv,pw=110,ph=94;
+  const dpr=cv.width/W,oS=S,oSkin=skin,oInv=inv;
   for(const c of $('stCast').querySelectorAll('canvas')){
-    const [k]=CAST[+c.dataset.i],w=Math.round(c.clientWidth*dpr),h=Math.round(c.clientHeight*dpr);if(w<4)continue;
+    const [k]=CAST[+c.dataset.i],w=Math.round(c.clientWidth*dpr),h=Math.round(c.clientHeight*dpr);if(w<4||h<4)continue;
+    const ph=94,pw=Math.round(ph*w/h);   // gleiches Seitenverhältnis wie das Porträt – keine Verzerrung
     c.width=w;c.height=h;const g=c.getContext('2d');
     if(k==='marisa'){g.setTransform(dpr,0,0,dpr,0,0);drawMarisa(g,c.clientWidth/2,c.clientHeight*.42,c.clientWidth/95,{body:true});continue;}
     ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,pw,ph);inv=0;
