@@ -22,6 +22,8 @@ public class MainActivity extends Activity {
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);   // Highscore (localStorage) bleibt gespeichert
         s.setMediaPlaybackRequiresUserGesture(false);
+        s.setCacheMode(WebSettings.LOAD_NO_CACHE);   // immer die mitgelieferte, neueste Spielversion laden
+        web.clearCache(true);
         web.setWebViewClient(new WebViewClient());
         web.setVerticalScrollBarEnabled(false);
         web.setHorizontalScrollBarEnabled(false);
@@ -48,6 +50,13 @@ public class MainActivity extends Activity {
         if (hasFocus) hideSystemBars();
     }
 
-    @Override protected void onPause() { super.onPause(); web.onPause(); }
-    @Override protected void onResume() { super.onResume(); web.onResume(); }
+    // Musik anhalten, wenn die App in den Hintergrund geht, und danach weiterspielen
+    @Override protected void onPause() {
+        web.evaluateJavascript("window.__pauseAll&&window.__pauseAll()", null);
+        super.onPause(); web.onPause();
+    }
+    @Override protected void onResume() {
+        super.onResume(); web.onResume();
+        web.evaluateJavascript("window.__resumeAll&&window.__resumeAll()", null);
+    }
 }
