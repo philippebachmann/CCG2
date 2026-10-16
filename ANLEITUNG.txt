@@ -1,4 +1,4 @@
-NINE LIVES – Attack or hide!  ·  Android-App (APK) über GitHub bauen   (Version 2.1)
+NINE LIVES – Fight or hide!  ·  Android-App (APK) über GitHub bauen   (Version 2.1)
 
 WICHTIG, damit wirklich die neue Version gebaut wird:
 - Am besten ein NEUES, leeres Repository anlegen (oder das alte löschen).
